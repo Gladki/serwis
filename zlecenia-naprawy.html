@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zlecenia Naprawy Wtryskiwaczy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2a2a2a;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #3a3a3a;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid #1a1a1a;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #b0b0b0;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #3a3a3a;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #1a1a1a;
+        }
+
+        .card h2 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d0d0d0;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #4a4a4a;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .info-box {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #1a1a1a;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #e0e0e0;
+        }
+
+        .info-box strong {
+            color: #ffffff;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-secondary {
+            background: #4a4a4a;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #3a3a3a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-danger {
+            background: #6a6a6a;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            background: #5a5a5a;
+        }
+
+        .btn-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .zlecenia-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .zlecenie-item {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #1a1a1a;
+            transition: transform 0.2s;
+        }
+
+        .zlecenie-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .zlecenie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .zlecenie-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .zlecenie-date {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .zlecenie-details {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.6;
+        }
+
+        .zlecenie-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #808080;
+        }
+
+        .parts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .parts-table th,
+        .parts-table td {
+            border: 1px solid #4a4a4a;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .parts-table th {
+            background: #2a2a2a;
+            font-weight: 600;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2a2a2a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a5a5a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ System Zleceń Naprawy Wtryskiwaczy</h1>
+            <p>Zarządzanie zleceniami naprawy wtryskiwaczy i pomp</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Formularz nowego zlecenia -->
+            <div class="card">
+                <h2>📝 Nowe Zlecenie</h2>
+                
+                <div class="info-box">
+                    <p><strong>Numer zlecenia:</strong> <span id="previewNumber">-</span></p>
+                    <p><strong>Data:</strong> <span id="previewDate">-</span></p>
+                </div>
+
+                <form id="zlecenieForm">
+                    <div class="form-group">
+                        <label for="telefon">Numer telefonu *</label>
+                        <input type="tel" id="telefon" placeholder="np. 667-234-079" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wtryskiwacz">Numer wtryskiwacza</label>
+                        <input type="text" id="wtryskiwacz" placeholder="np. 098435360 0445116030">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pompa">Numer pompy</label>
+                        <input type="text" id="pompa" placeholder="Numer pompy">
+                    </div>
+
+                    <div class="btn-actions">
+                        <button type="submit" class="btn btn-primary">✓ Utwórz Zlecenie</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">↻ Wyczyść</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista zleceń -->
+            <div class="card">
+                <h2>📋 Lista Zleceń (<span id="zlecenieCount">0</span>)</h2>
+                <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="exportData()">💾 Eksportuj dane</button>
+                    <button class="btn btn-secondary" onclick="importData()">📥 Importuj dane</button>
+                </div>
+                <input type="file" id="importFile" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+                <div id="zlecenieList" class="zlecenia-list">
+                    <div class="empty-state">
+                        <p>Brak zleceń. Utwórz pierwsze zlecenie!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+        // Storage dla zleceń
+        let zlecenia = JSON.parse(localStorage.getItem('zlecenia') || '[]');
+        let sequenceNumber = parseInt(localStorage.getItem('sequenceNumber') || '1');
+
+        // Funkcje pomocnicze
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function generateZlecenieNumber() {
+            const week = getWeekNumber(new Date());
+            return `${sequenceNumber}/${String(week).padStart(2, '0')}`;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('pl-PL', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function getCurrentMonthYear() {
+            return new Date().toLocaleDateString('pl-PL', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+        }
+
+        // Aktualizacja podglądu
+        function updatePreview() {
+            document.getElementById('previewNumber').textContent = generateZlecenieNumber();
+            document.getElementById('previewDate').textContent = formatDate(new Date());
+        }
+
+        // Inicjalizacja
+        updatePreview();
+        renderZlecenia();
+
+        // Obsługa formularza
+        document.getElementById('zlecenieForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const zlecenie = {
+                id: Date.now(),
+                numer: generateZlecenieNumber(),
+                data: new Date().toISOString(),
+                telefon: document.getElementById('telefon').value,
+                wtryskiwacz: document.getElementById('wtryskiwacz').value,
+                pompa: document.getElementById('pompa').value
+            };
+
+            zlecenia.unshift(zlecenie);
+            sequenceNumber++;
+            
+            localStorage.setItem('zlecenia', JSON.stringify(zlecenia));
+            localStorage.setItem('sequenceNumber', sequenceNumber);
+
+            resetForm();
+            updatePreview();
+            renderZlecenia();
+
+            alert('✓ Zlecenie utworzone pomyślnie!');
+        });
+
+        function resetForm() {
+            document.getElementById('zlecenieForm').reset();
+        }
+
+        function renderZlecenia() {
+            const listContainer = document.getElementById('zlecenieList');
+            document.getElementById('zlecenieCount').textContent = zlecenia.length;
+
+            if (zlecenia.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state"><p>Brak zleceń. Utwórz pierwsze zlecenie!</p></div>';
+                return;
+            }
+
+            listContainer.innerHTML = zlecenia.map(z => `
+                <div class="zlecenie-item">
+                    <div class="zlecenie-header">
+                        <span class="zlecenie-number">Zlecenie ${z.numer}</span>
+                        <span class="zlecenie-date">${formatDate(new Date(z.data))}</span>
+                    </div>
+                    <div class="zlecenie-details">
+                        <p><strong>Telefon:</strong> ${z.telefon}</p>
+                        ${z.wtryskiwacz ? `<p><strong>Wtryskiwacz:</strong> ${z.wtryskiwacz}</p>` : ''}
+                        ${z.pompa ? `<p><strong>Pompa:</strong> ${z.pompa}</p>` : ''}
+                    </div>
+                    <div class="zlecenie-actions">
+                        <button class="btn btn-primary" onclick="downloadPDF(${z.id})">📄 PDF</button>
+                        <button class="btn btn-secondary" onclick="downloadWord(${z.id})">📝 Word</button>
+                        <button class="btn btn-danger" onclick="deleteZlecenie(${z.id})">🗑️ Usuń</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteZlecenie(id) {
+            if (!confirm('Czy na pewno chcesz usunąć to zlecenie?')) return;
+
+            zlecenia = zlecenia.filter(z => z.id !== id);
+            localStorage.setItem('zlecenia', JSON.stringify(zlecenia));
+            renderZlecenia();
+        }
+
+        async function downloadPDF(id) {
+            const zlecenie = zlecenia.find(z => z.id === id);
+            if (!zlecenie) return;
+
+            // Create HTML content for PDF
+            const monthYear = new Date(zlecenie.data).toLocaleDateString('pl-PL', { 
+                month: 'long'
+            });
+
+            const content = `
+                <div style="font-family: Arial, sans-serif; padding: 40px; font-size: 12pt;">
+                    <div style="font-size: 11pt; margin-bottom: 20px;">${monthYear.charAt(0).toUpperCase() + monthYear.slice(1)}</div>
+                    <h1 style="font-size: 16pt; margin: 20px 0 10px 0; font-weight: bold;">Zlecenie naprawy wtryskiwacza/pompy</h1>
+                    <div style="font-size: 10pt; margin-bottom: 20px;">Data ostatniej aktualizacji: ${formatDate(new Date(zlecenie.data))}</div>
+                    
+                    <h2 style="font-size: 14pt; margin: 20px 0 10px 0; font-weight: bold;">Dane</h2>
+                    <div style="margin: 8px 0; font-size: 11pt;">Numery zlecenia: ${zlecenie.numer}</div>
+                    <div style="margin: 8px 0; font-size: 11pt;">Numer telefonu: ${zlecenie.telefon}</div>
+                    <div style="margin: 8px 0; font-size: 11pt;">Numer wtryskiwacza: ${zlecenie.wtryskiwacz || '-'}</div>
+                    <div style="margin: 8px 0; font-size: 11pt;">Numer pompy: ${zlecenie.pompa || '-'}</div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h2 style="font-size: 14pt; margin: 20px 0 10px 0; font-weight: bold;">Części / uwagi</h2>
+                        
+                        <table style="margin-top: 15px; border-collapse: collapse; width: 100%;">
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; height: 40px; width: 50%;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; height: 40px; width: 50%;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; height: 40px; width: 50%;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; height: 40px; width: 50%;"></td>
+                            </tr>
+                        </table>
+                        
+                        <table style="margin-top: 20px; border-collapse: collapse; width: 100%;">
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px; width: 10%;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px; width: 22.5%;">R/C</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px; width: 22.5%;">GAP</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px; width: 22.5%;">ISOLATION</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px; width: 22.5%;">RES.MAX</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;">1</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;">2</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;">3</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;">4</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;">5</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;">6</td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                                <td style="border: 1px solid #000; padding: 8px; text-align: center; height: 25px;"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // Create temporary element
+            const element = document.createElement('div');
+            element.innerHTML = content;
+
+            // Generate PDF
+            const opt = {
+                margin: 10,
+                filename: `Zlecenie_${zlecenie.numer.replace('/', '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('Błąd przy generowaniu PDF. Spróbuj ponownie.');
+            }
+        }
+
+        async function downloadWord(id) {
+            const zlecenie = zlecenia.find(z => z.id === id);
+            if (!zlecenie) return;
+
+            try {
+                // Check if docx library is loaded
+                if (typeof docx === 'undefined' && typeof window.docx === 'undefined') {
+                    alert('Biblioteka Word nie została załadowana. Odśwież stronę i spróbuj ponownie.');
+                    return;
+                }
+
+                const docxLib = typeof docx !== 'undefined' ? docx : window.docx;
+                const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } = docxLib;
+
+                const monthYear = new Date(zlecenie.data).toLocaleDateString('pl-PL', { 
+                    month: 'long'
+                });
+
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: [
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: monthYear.charAt(0).toUpperCase() + monthYear.slice(1),
+                                        size: 24
+                                    })
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: 'Zlecenie naprawy wtryskiwacza/pompy',
+                                        bold: true,
+                                        size: 32
+                                    })
+                                ],
+                                spacing: { before: 200, after: 200 }
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Data ostatniej aktualizacji: ${formatDate(new Date(zlecenie.data))}`,
+                                        size: 20
+                                    })
+                                ],
+                                spacing: { after: 200 }
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: 'Dane',
+                                        bold: true,
+                                        size: 28
+                                    })
+                                ],
+                                spacing: { before: 200, after: 100 }
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Numery zlecenia: ${zlecenie.numer}`,
+                                        size: 22
+                                    })
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Numer telefonu: ${zlecenie.telefon}`,
+                                        size: 22
+                                    })
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Numer wtryskiwacza: ${zlecenie.wtryskiwacz || '-'}`,
+                                        size: 22
+                                    })
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Numer pompy: ${zlecenie.pompa || '-'}`,
+                                        size: 22
+                                    })
+                                ],
+                                spacing: { after: 200 }
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: 'Części / uwagi',
+                                        bold: true,
+                                        size: 28
+                                    })
+                                ],
+                                spacing: { before: 200, after: 100 }
+                            }),
+                            new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                rows: [
+                                    new TableRow({
+                                        height: { value: 800, rule: "atLeast" },
+                                        children: [
+                                            new TableCell({ 
+                                                children: [new Paragraph('')],
+                                                width: { size: 50, type: WidthType.PERCENTAGE }
+                                            }),
+                                            new TableCell({ 
+                                                children: [new Paragraph('')],
+                                                width: { size: 50, type: WidthType.PERCENTAGE }
+                                            })
+                                        ]
+                                    }),
+                                    new TableRow({
+                                        height: { value: 800, rule: "atLeast" },
+                                        children: [
+                                            new TableCell({ 
+                                                children: [new Paragraph('')],
+                                                width: { size: 50, type: WidthType.PERCENTAGE }
+                                            }),
+                                            new TableCell({ 
+                                                children: [new Paragraph('')],
+                                                width: { size: 50, type: WidthType.PERCENTAGE }
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }),
+                            new Paragraph({
+                                children: [new TextRun({ text: '' })],
+                                spacing: { after: 200 }
+                            }),
+                            new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                rows: [
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({ 
+                                                children: [new Paragraph({ 
+                                                    children: [new TextRun({ text: '' })],
+                                                    alignment: AlignmentType.CENTER
+                                                })],
+                                                width: { size: 10, type: WidthType.PERCENTAGE }
+                                            }),
+                                            new TableCell({ 
+                                                children: [new Paragraph({ 
+                                                    children: [new TextRun({ text: 'R/C' })],
+                                                    alignment: AlignmentType.CENTER
+                                                })],
+                                                width: { size: 22.5, type: WidthType.PERCENTAGE }
+                                            }),
+                                            new TableCell({ 
+                                                children: [new Paragraph({ 
+                                                    children: [new TextRun({ text: 'GAP' })],
+                                                    alignment: AlignmentType.CENTER
+                                                })],
+                                                width: { size: 22.5, type: WidthType.PERCENTAGE }
+                                            }),
+                                            new TableCell({ 
+                                                children: [new Paragraph({ 
+                                                    children: [new TextRun({ text: 'ISOLATION' })],
+                                                    alignment: AlignmentType.CENTER
+                                                })],
+                                                width: { size: 22.5, type: WidthType.PERCENTAGE }
+                                            }),
+                                            new TableCell({ 
+                                                children: [new Paragraph({ 
+                                                    children: [new TextRun({ text: 'RES.MAX' })],
+                                                    alignment: AlignmentType.CENTER
+                                                })],
+                                                width: { size: 22.5, type: WidthType.PERCENTAGE }
+                                            })
+                                        ]
+                                    }),
+                                    ...Array.from({ length: 6 }, (_, i) => new TableRow({
+                                        children: [
+                                            new TableCell({ 
+                                                children: [new Paragraph({ 
+                                                    children: [new TextRun({ text: `${i + 1}` })],
+                                                    alignment: AlignmentType.CENTER
+                                                })]
+                                            }),
+                                            new TableCell({ children: [new Paragraph('')] }),
+                                            new TableCell({ children: [new Paragraph('')] }),
+                                            new TableCell({ children: [new Paragraph('')] }),
+                                            new TableCell({ children: [new Paragraph('')] })
+                                        ]
+                                    }))
+                                ]
+                            })
+                        ]
+                    }]
+                });
+
+                const blob = await Packer.toBlob(doc);
+                saveAs(blob, `Zlecenie_${zlecenie.numer.replace('/', '_')}.docx`);
+            } catch (error) {
+                console.error('Word generation error:', error);
+                alert('Błąd przy generowaniu Word. Szczegóły w konsoli: ' + error.message);
+            }
+        }
+
+        // Export/Import functions
+        function exportData() {
+            const data = {
+                zlecenia: zlecenia,
+                sequenceNumber: sequenceNumber,
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zlecenia_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('✓ Dane wyeksportowane pomyślnie!');
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.zlecenia || !Array.isArray(data.zlecenia)) {
+                        throw new Error('Nieprawidłowy format danych');
+                    }
+
+                    if (confirm('Czy chcesz nadpisać istniejące dane? (Kliknij Cancel aby dodać do istniejących)')) {
+                        // Overwrite
+                        zlecenia = data.zlecenia;
+                        sequenceNumber = data.sequenceNumber || sequenceNumber;
+                    } else {
+                        // Merge
+                        zlecenia = [...data.zlecenia, ...zlecenia];
+                        // Update sequence number to max
+                        const maxNum = Math.max(...zlecenia.map(z => {
+                            const num = parseInt(z.numer.split('/')[0]);
+                            return isNaN(num) ? 0 : num;
+                        }));
+                        sequenceNumber = Math.max(sequenceNumber, maxNum + 1);
+                    }
+
+                    localStorage.setItem('zlecenia', JSON.stringify(zlecenia));
+                    localStorage.setItem('sequenceNumber', sequenceNumber);
+                    
+                    renderZlecenia();
+                    updatePreview();
+                    alert('✓ Dane zaimportowane pomyślnie!');
+                } catch (error) {
+                    alert('Błąd importu: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset input
+            event.target.value = '';
+        }
+    </script>
+</body>
+</html>
